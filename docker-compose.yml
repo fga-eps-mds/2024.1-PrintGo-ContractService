@@ -16,3 +16,4 @@ networks:
   printgo_network:
     name: printgo_network
     driver: bridge
+    external: true
