@@ -3,7 +3,7 @@ services:
     container_name: contracts-api
     restart: on-failure
     build:
-      context: ../
+      context: .
       dockerfile: ./docker/Dockerfile.development
     volumes:
       - .:/src
@@ -11,9 +11,11 @@ services:
       - "8001:8000"
     networks:
       - printgo_network
+    depends_on: 
+      - contracts-db
   contracts-db:
     image: postgres:13
-    container_name: contracs-db
+    container_name: contracts-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
