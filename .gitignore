@@ -132,3 +132,7 @@ dist
 # Sonar Reports
 
 reports/*
+
+# Database local data
+
+db-data/

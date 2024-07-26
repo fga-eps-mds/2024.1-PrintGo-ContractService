@@ -12,3 +12,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Contrato {
+  id          Int      @id @default(autoincrement())
+  numero      String   @unique @db.VarChar(10)
+  nomeGestor  String   @db.VarChar(255)
+  descricao   String   @db.VarChar(255)
+  dataInicio  DateTime @default(now())
+  dataTermino DateTime @default(now())
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
