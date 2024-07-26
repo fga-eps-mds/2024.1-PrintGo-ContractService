@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -15,7 +16,7 @@ datasource db {
 
 model Contrato {
   id          Int      @id @default(autoincrement())
-  numero      String   @unique @db.VarChar(10)
+  numero      String   @unique @db.VarChar(50)
   nomeGestor  String   @db.VarChar(255)
   descricao   String   @db.VarChar(255)
   dataInicio  DateTime @default(now())

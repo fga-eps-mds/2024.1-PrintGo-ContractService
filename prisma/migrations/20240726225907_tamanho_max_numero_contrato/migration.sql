@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Contrato" ALTER COLUMN "numero" SET DATA TYPE VARCHAR(50);
