@@ -37,7 +37,7 @@ jobs:
         run: npm install
 
       - name: Executa testes e gera cobertura
-        run: npm test:all
+        run: npm run test:all
         env:
           DATABASE_URL: postgresql://testuser:testpassword@localhost:5444/testdb
 
