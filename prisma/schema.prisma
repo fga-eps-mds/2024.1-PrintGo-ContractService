@@ -14,7 +14,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Contrato {
+model contrato {
   id          Int      @id @default(autoincrement())
   numero      String   @unique @db.VarChar(50)
   nomeGestor  String   @db.VarChar(255)
