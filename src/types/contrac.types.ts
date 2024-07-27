@@ -4,6 +4,7 @@ export type contractCreatInput = {
     descricao: string;
     dataInicio: Date;
     dataTermino: Date;
+    ativo: boolean;
 }
 
 export type contractUpdateInput = {
@@ -12,4 +13,5 @@ export type contractUpdateInput = {
     descricao: string;
     dataInicio: Date;
     dataTermino: Date;
+    ativo: boolean;
 }

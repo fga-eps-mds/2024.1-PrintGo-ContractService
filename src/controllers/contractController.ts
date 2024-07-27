@@ -11,6 +11,7 @@ export default {
                 descricao,
                 dataInicio,
                 dataTermino,
+                ativo,
             } = request.body as contractCreatInput;
 
             const contractExist = await prisma.contrato.findUnique({ where: { numero } });
@@ -29,6 +30,7 @@ export default {
                     descricao,
                     dataInicio,
                     dataTermino,
+                    ativo,
                 }
             });
 
@@ -108,4 +110,37 @@ export default {
             });
           }
     },
+
+    async toggleContract(request: Request, response: Response) {
+        try {
+            const { id, ativo } = request.body;
+    
+            const contractExists = await prisma.contrato.findUnique({ where: { id } });
+    
+            if (!contractExists) {
+                return response.status(404).json({
+                    error: true,
+                    message: 'Erro: Contrato não encontrado!',
+                });
+            }
+
+            const newStatus = !contractExists.ativo;
+
+            const updatedStatusContract = await prisma.contrato.update({
+                where: { id: parseInt(id) },
+                data: { ativo: newStatus },
+            });
+    
+            return response.status(200).json({
+                message: 'Sucesso: Contrato atualizado!',
+                data: updatedStatusContract,
+            });
+    
+        } catch (error) {
+            return response.status(500).json({ 
+                error: true, 
+                message: 'Erro: Ocorreu um erro ao atualizar o status do Contrato.' });
+        }
+    },
+  
 }
