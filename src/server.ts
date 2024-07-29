@@ -10,7 +10,7 @@ app.use(Express.json());
 
 app.use(cors());
 
-app.use("/contract", contractRoutes)
+app.use("/", contractRoutes)
 
 const server = app.listen(PORT, () =>{
   console.log(`Server running on ${PORT}`)

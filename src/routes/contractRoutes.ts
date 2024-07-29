@@ -9,9 +9,9 @@ contractRoutes.use(logger);
 
 contractRoutes.get("/", contractController.list);
 contractRoutes.get("/:id", contractController.getById);
-contractRoutes.post("/", contractController.create);
-contractRoutes.put("/:id", contractController.edit);
-contractRoutes.patch("/:id", contractController.toggleContract);
+contractRoutes.post("/create", contractController.create);
+contractRoutes.patch("/:id", contractController.edit);
+contractRoutes.patch("/changeStatus/:id", contractController.toggleContract);
 
 export default contractRoutes;
 
