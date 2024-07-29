@@ -5,9 +5,11 @@
   "main": "app.js",
   "scripts": {
     "build": "tsc",
-    "dev": "nodemon dist/src/server.js",
+    "start": "node dist/src/server.js",
+    "dev": "nodemon src/server.ts",
     "test:all": "CI=true npm run test -- --coverage",
-    "test": "jest --passWithNoTests --no-cache --runInBand"
+    "test": "docker exec -it contracts-api npx jest --passWithNoTests --no-cache --runInBand",
+    "migrate:dev": "docker exec -it contracts-api npx prisma migrate dev"
   },
   "repository": {
     "type": "git",
