@@ -26,6 +26,7 @@ services:
       - "5433:5432"
     networks:
       - printgo_network
+    command: ["sh", "-c", "npx prisma migrate dev && npm run dev"]
     
 
 networks:
