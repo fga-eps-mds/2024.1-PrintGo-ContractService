@@ -28,8 +28,7 @@ export default {
     } catch (error) {
       return response.status(500).json({
         error: true,
-        message:
-          "Erro: Ocorreu um erro ao buscar contratos.",
+        message: "Erro: Ocorreu um erro ao buscar contratos.",
       });
     }
   },
@@ -37,19 +36,23 @@ export default {
   async getById(request: Request, response: Response) {
     const id = request.params.id as string;
 
-    const contract = await prisma.contrato.findUnique({
-      where: { id: Number(id) },
-    });
-
-    if (contract) {
-      const status = 200;
-      return response.status(status).json(contract);
-    } else {
-      const status = 404;
-      return response.status(status).json({
-        error: true,
-        message: "Erro: Não foi possível encontrar o contrato.",
+    try {
+      const contract = await prisma.contrato.findUnique({
+        where: { id: Number(id) },
       });
+
+      if (contract) {
+        const status = 200;
+        return response.status(status).json(contract);
+      } else {
+        const status = 404;
+        return response.status(status).json({
+          error: true,
+          message: "Erro: Não foi possível encontrar o contrato.",
+        });
+      }
+    } catch (error) {
+      return response.status(500).json({ error: true, message: error.message });
     }
   },
 
