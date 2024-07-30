@@ -4,7 +4,7 @@ import contractRoutes from './routes/contractRoutes';
 
 const app = Express();
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8002;
 
 app.use(Express.json());
 
