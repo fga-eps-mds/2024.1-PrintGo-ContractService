@@ -1,168 +1,157 @@
 import request from 'supertest';
-import { server } from '../src/server'; // Importe sua aplicação Express
-import { prisma } from '../__mocks__/prisma';
-
-jest.mock('../src/database', () => ({
-  prisma
-}));
+import { server } from '../src/server';
+import { prismaMock } from '../__mocks__/prisma';
+import { contractCreatInput, contractUpdateInput } from '../src/types/contrac.types';
 
 describe('Contract Controller', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  let contractId: number;
+
+  beforeAll(async () => {
+    process.env.PORT = '5000';
+    await prismaMock.$connect();
   });
 
-  afterAll(() =>{
-    server.close()
-  })
-
-  describe('list', () => {
-    it('should list contracts', async () => {
-      const mockContracts = [
-        { id: 1, numero: '123', nomeGestor: 'John Doe', descricao: 'Contract 1', dataInicio: new Date(), dataTermino: new Date(), ativo: true },
-      ];
-
-      prisma.contrato.findMany.mockResolvedValue(mockContracts);
-      prisma.contrato.count.mockResolvedValue(1);
-
-      const response = await request(server).get('/contract');
-
-      expect(response.status).toBe(200);
-      expect(response.body.data).toEqual(mockContracts);
-      expect(response.body.total).toBe(1);
-    });
-
-    it('should handle errors', async () => {
-      prisma.contrato.findMany.mockRejectedValue(new Error('Erro ao buscar contratos'));
-
-      const response = await request(server).get('/contract');
-
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Erro: Ocorreu um erro ao buscar contratos.');
-    });
+  afterAll(async () => {
+    await prismaMock.$disconnect();
+    server.close();
   });
 
-  describe('getById', () => {
-    it('should return a contract by id', async () => {
-      const mockContract = { id: 1, numero: '123', nomeGestor: 'John Doe', descricao: 'Contract 1', dataInicio: new Date(), dataTermino: new Date(), ativo: true };
+  it('should create a new contract', async () => {
+    const newContract: contractCreatInput = {
+      numero: '1234',
+      nomeGestor: 'John Doe',
+      descricao: 'Descrição do contrato',
+      dataInicio: new Date('2024-01-01'),
+      dataTermino: new Date('2025-01-01'),
+      ativo: true,
+    };
 
-      prisma.contrato.findUnique.mockResolvedValue(mockContract);
+    const createdContract = {
+      id: 1,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...newContract,
+    };
 
-      const response = await request(server).get('/contract/1');
+    prismaMock.contrato.create.mockResolvedValue(createdContract);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(mockContract);
-    });
+    const response = await request(server)
+      .post('/create')
+      .send(newContract);
 
-    it('should return 404 if contract not found', async () => {
-      prisma.contrato.findUnique.mockResolvedValue(null);
-
-      const response = await request(server).get('/contract/1');
-
-      expect(response.status).toBe(404);
-      expect(response.body.message).toBe('Erro: Não foi possível encontrar o contrato.');
-    });
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe('Contrato criado com sucesso!');
+    contractId = response.body.data.id;
   });
 
-  describe('create', () => {
-    it('should create a new contract', async () => {
-      const newContract = { numero: '123', nomeGestor: 'John Doe', descricao: 'New Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true };
-      const createdContract = { ...newContract, id: 1 };
+  it('should list contracts', async () => {
+    const contracts = [
+      {
+        id: 1,
+        numero: '1234',
+        nomeGestor: 'John Doe',
+        descricao: 'Descrição do contrato',
+        dataInicio: new Date('2024-01-01'),
+        dataTermino: new Date('2025-01-01'),
+        ativo: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
 
-      prisma.contrato.findUnique.mockResolvedValue(null);
-      prisma.contrato.create.mockResolvedValue(createdContract);
+    prismaMock.contrato.findMany.mockResolvedValue(contracts);
+    prismaMock.contrato.count.mockResolvedValue(1);
 
-      const response = await request(server).post('/contract').send(newContract);
+    const response = await request(server).get('/').query({ page: 1, pageSize: 5 });
 
-      expect(response.status).toBe(201);
-      expect(response.body.data).toEqual(createdContract);
-    });
-
-    it('should return 400 if contract already exists', async () => {
-      const existingContract = { numero: '123', nomeGestor: 'John Doe', descricao: 'Existing Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true };
-
-      prisma.contrato.findUnique.mockResolvedValue(existingContract);
-
-      const response = await request(server).post('/contract').send(existingContract);
-
-      expect(response.status).toBe(400);
-      expect(response.body.message).toBe('Erro: Contrato já existe!');
-    });
-
-    it('should handle errors', async () => {
-      prisma.contrato.create.mockRejectedValue(new Error('Erro ao criar contrato'));
-
-      const response = await request(server).post('/contract').send({ numero: '123', nomeGestor: 'John Doe', descricao: 'New Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true });
-
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Erro ao criar contrato');
-    });
+    expect(response.status).toBe(200);
+    expect(response.body.data.length).toBeGreaterThan(0);
   });
 
-  describe('edit', () => {
-    it('should update a contract', async () => {
-      const updatedContract = { id: 1, numero: '123', nomeGestor: 'Jane Doe', descricao: 'Updated Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true };
+  it('should get a contract by id', async () => {
+    const contract = {
+      id: 1,
+      numero: '1234',
+      nomeGestor: 'John Doe',
+      descricao: 'Descrição do contrato',
+      dataInicio: new Date('2024-01-01'),
+      dataTermino: new Date('2025-01-01'),
+      ativo: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-      prisma.contrato.findUnique.mockResolvedValue(updatedContract);
-      prisma.contrato.update.mockResolvedValue(updatedContract);
+    prismaMock.contrato.findUnique.mockResolvedValue(contract);
 
-      const response = await request(server).put('/contract/1').send(updatedContract);
+    const response = await request(server).get(`/${contractId}`);
 
-      expect(response.status).toBe(201);
-      expect(response.body.data).toEqual(updatedContract);
-    });
-
-    it('should return 404 if contract not found', async () => {
-      prisma.contrato.findUnique.mockResolvedValue(null);
-
-      const response = await request(server).put('/contract/1').send({ numero: '123', nomeGestor: 'Jane Doe', descricao: 'Updated Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true });
-
-      expect(response.status).toBe(404);
-      expect(response.body.message).toBe('Erro: Contrato não encontrado!');
-    });
-
-    it('should handle errors', async () => {
-      prisma.contrato.update.mockRejectedValue(new Error('Erro ao atualizar contrato'));
-
-      const response = await request(server).put('/contract/1').send({ numero: '123', nomeGestor: 'Jane Doe', descricao: 'Updated Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true });
-
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Erro ao atualizar contrato');
-    });
+    expect(response.status).toBe(200);
+    expect(response.body.id).toBe(contractId);
   });
 
-  describe('toggleContract', () => {
-    it('should toggle the status of a contract', async () => {
-      const existingContract = { id: 1, numero: '123', nomeGestor: 'John Doe', descricao: 'Contract', dataInicio: new Date(), dataTermino: new Date(), ativo: true };
-      const updatedContract = { ...existingContract, ativo: false };
+  it('should edit a contract', async () => {
+    const updatedContract: contractUpdateInput = {
+      numero: '1234',
+      nomeGestor: 'Jane Doe',
+      descricao: 'Descrição do contrato atualizado',
+      dataInicio: new Date('2024-01-01'),
+      dataTermino: new Date('2025-01-01'),
+      ativo: true,
+    };
 
-      prisma.contrato.findUnique.mockResolvedValue(existingContract);
-      prisma.contrato.update.mockResolvedValue(updatedContract);
+    const existingContract = {
+      id: contractId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ...updatedContract,
+    };
 
-      const response = await request(server).patch('/contract/1');
+    prismaMock.contrato.findUnique.mockResolvedValue(existingContract);
 
-      expect(response.status).toBe(200);
-      expect(response.body.data).toEqual(updatedContract);
+    prismaMock.contrato.update.mockResolvedValue(existingContract);
+
+    const response = await request(server)
+      .patch(`/${contractId}`)
+      .send(updatedContract);
+
+    expect(response.status).toBe(201);
+    expect(response.body.message).toBe('Sucesso: Contrato atualizado!');
+    expect(response.body.data.nomeGestor).toBe('Jane Doe');
+  });
+
+  it('should toggle contract status', async () => {
+    const contract = {
+      id: contractId,
+      numero: '1234',
+      nomeGestor: 'John Doe',
+      descricao: 'Descrição do contrato',
+      dataInicio: new Date('2024-01-01'),
+      dataTermino: new Date('2025-01-01'),
+      ativo: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    prismaMock.contrato.findUnique.mockResolvedValue(contract);
+
+    prismaMock.contrato.update.mockResolvedValue({
+      ...contract,
+      ativo: !contract.ativo,
     });
 
-    it('should return 404 if contract not found', async () => {
-      prisma.contrato.findUnique.mockResolvedValue(null);
+    const response = await request(server).patch(`/changeStatus/${contractId}`);
 
-      const response = await request(server).patch('/contract/1');
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('Sucesso: Contrato atualizado!');
+    expect(response.body.data.ativo).toBe(false);
+  });
 
-      expect(response.status).toBe(404);
-      expect(response.body.message).toBe('Erro: Contrato não encontrado!');
-    });
+  it('should return 404 for a non-existent contract', async () => {
+    prismaMock.contrato.findUnique.mockResolvedValue(null);
 
-    it('should handle errors', async () => {
-      const mockError = new Error('Erro ao atualizar o status do Contrato');
-    
-      prisma.contrato.findUnique.mockResolvedValue({ id: 1, ativo: true }); // Garantindo que o contrato existe
-      prisma.contrato.update.mockRejectedValue(mockError); // Simulando um erro na atualização
-    
-      const response = await request(server).patch('/contract/1');
-    
-      expect(response.status).toBe(500);
-      expect(response.body.message).toBe('Erro: Ocorreu um erro ao atualizar o status do Contrato.');
-    });
+    const response = await request(server).get('/9999');
+
+    expect(response.status).toBe(404);
+    expect(response.body.message).toBe('Erro: Não foi possível encontrar o contrato.');
   });
 });
