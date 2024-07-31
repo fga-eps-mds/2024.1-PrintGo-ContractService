@@ -1,15 +1,6 @@
+import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
-import { jest } from '@jest/globals';
 
-// Crie uma instância simulada do PrismaClient
-const prismaMock = {
-  contrato: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    count: jest.fn(),
-  },
-} as unknown as PrismaClient;
+export const prismaMock = mockDeep<PrismaClient>();
 
-export { prismaMock };
+export type PrismaMockType = DeepMockProxy<PrismaClient>;
