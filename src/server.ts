@@ -6,9 +6,15 @@ const app = Express();
 
 const PORT = process.env.PORT || 8002;
 
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept",
+};
+
 app.use(Express.json());
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use("/", contractRoutes)
 
