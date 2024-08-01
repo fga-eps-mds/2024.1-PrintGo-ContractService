@@ -6,7 +6,7 @@
 
 ## Quality Control
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fga-eps-mds-1_2024-1-printgo-contractservice&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fga-eps-mds-1_2024-1-printgo-contractservice)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=fga-eps-mds-1_2024-1-printgo-contractservice&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=fga-eps-mds-1_2024-1-printgo-contractservice&branch=main)
 
 [![codecov](https://codecov.io/gh/fga-eps-mds/2024-1-printgo-contractService/graph/badge.svg?token=g0er9UGKLc)](https://codecov.io/gh/fga-eps-mds/2024.1-PrintGo-ContractService)
 
