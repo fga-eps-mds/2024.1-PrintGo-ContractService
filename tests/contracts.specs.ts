@@ -99,8 +99,6 @@ describe('Contract Controller', () => {
         updatedAt: new Date(response.body.updatedAt).toISOString()
       };
 
-      console.log(response.body, contract)
-
       expect(response.status).toBe(200);
       expect(received).toMatchObject(expected);
       expect(findUniqueSpy).toHaveBeenCalled();
