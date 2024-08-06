@@ -9,6 +9,8 @@
     "dev": "nodemon src/server.ts",
     "test:all": "CI=true npm run test -- --coverage",
     "test": "npx jest --passWithNoTests --no-cache --runInBand",
+    "lint": "eslint  -c *.ts",
+    "lint:fix": "eslint  -c *.ts --fix",
     "migrate:dev": "docker exec -it contracts-api npx prisma migrate dev"
   },
   "repository": {
@@ -28,6 +30,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.14.12",
     "@types/supertest": "^6.0.2",
+    "eslint": "^9.8.0",
     "jest": "^29.7.0",
     "jest-sonar": "^0.2.16",
     "jest-sonar-reporter": "^2.0.0",
