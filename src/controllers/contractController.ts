@@ -8,22 +8,11 @@ import {
 export default {
   async list(request: Request, response: Response) {
     try {
-      const numero = request.query.numero as string;
 
-      const page = parseInt(request.query.page as string) || 1;
-      const pageSize = parseInt(request.query.pageSize as string) || 5;
-
-      const skip = (page - 1) * pageSize;
-      const take = pageSize;
-      const contracts = await prisma.contrato.findMany({ skip, take });
-      const totalContracts = await prisma.contrato.count();
+      const contracts = await prisma.contrato.findMany();
 
       return response.status(200).json({
         data: contracts,
-        page: page,
-        pageSize: pageSize,
-        total: totalContracts,
-        totalPages: Math.ceil(totalContracts / pageSize),
       });
     } catch (error) {
       return response.status(500).json({
