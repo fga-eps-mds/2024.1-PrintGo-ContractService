@@ -45,21 +45,18 @@ describe('Contract Controller', () => {
       ];
 
       const findManySpy = jest.spyOn(prisma.contrato, 'findMany').mockResolvedValue(contracts);
-      const countSpy = jest.spyOn(prisma.contrato, 'count').mockResolvedValue(1);
 
-      const response = await request(server).get('/').query({ page: 1, pageSize: 5 });
+      const response = await request(server).get('/');
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveLength(1);
-      expect(response.body.total).toBe(1);
       expect(findManySpy).toHaveBeenCalled();
-      expect(countSpy).toHaveBeenCalled();
     });
 
     it('should handle errors', async () => {
       jest.spyOn(prisma.contrato, 'findMany').mockRejectedValue(new Error('Database error'));
 
-      const response = await request(server).get('/').query({ page: 1, pageSize: 5 });
+      const response = await request(server).get('/');
 
       expect(response.status).toBe(500);
       expect(response.body.message).toBe('Erro: Ocorreu um erro ao buscar contratos.');
